@@ -1,0 +1,8 @@
+**/target/
+**/build/
+**/.gradle/
+**/.idea/
+**/local.properties
+**/nbproject/private/
+.DS_Store
+*.class
