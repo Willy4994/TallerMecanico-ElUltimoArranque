@@ -1,0 +1,66 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#ffffff","primaryColor":"#ffffff","primaryTextColor":"#152238","primaryBorderColor":"#475569","lineColor":"#475569"}}}%%
+erDiagram
+    direction LR
+    CLIENTES ||--o{ VEHICULOS : posee
+    VEHICULOS ||--o{ ORDENES_TRABAJO : tiene
+    MECANICOS ||--o{ ORDENES_TRABAJO : atiende
+    ORDENES_TRABAJO ||--o{ ORDEN_SERVICIOS : incluye
+    SERVICIOS ||--o{ ORDEN_SERVICIOS : corresponde
+    ORDENES_TRABAJO ||--o{ ORDEN_REPUESTOS : utiliza
+    REPUESTOS ||--o{ ORDEN_REPUESTOS : corresponde
+    CLIENTES {
+        int id PK
+        varchar identificador UK
+        varchar nombre
+        varchar telefono
+        varchar correo
+    }
+    VEHICULOS {
+        int id PK
+        int cliente_id FK
+        varchar placa UK
+        varchar marca
+        varchar modelo
+        int anio
+    }
+    MECANICOS {
+        int id PK
+        varchar nombre
+        varchar telefono
+        varchar especialidad
+    }
+    ORDENES_TRABAJO {
+        int id PK
+        int vehiculo_id FK
+        int mecanico_id FK
+        text problema
+        varchar estado
+        timestamp fecha_creacion
+        datetime fecha_finalizacion
+        decimal total
+    }
+    SERVICIOS {
+        int id PK
+        varchar descripcion
+        decimal costo
+    }
+    REPUESTOS {
+        int id PK
+        varchar nombre
+        varchar descripcion
+        decimal precio
+        int existencia
+    }
+    ORDEN_SERVICIOS {
+        int id PK
+        int orden_id FK
+        int servicio_id FK
+        decimal costo
+    }
+    ORDEN_REPUESTOS {
+        int id PK
+        int orden_id FK
+        int repuesto_id FK
+        int cantidad
+        decimal precio
+    }

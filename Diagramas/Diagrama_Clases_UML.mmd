@@ -1,0 +1,67 @@
+%%{init: {"theme":"base","themeVariables":{"background":"#ffffff","primaryColor":"#ffffff","primaryTextColor":"#152238","primaryBorderColor":"#475569","lineColor":"#475569"}}}%%
+classDiagram
+    direction LR
+    class Persona {
+        <<abstract>>
+        -String nombre
+        +Persona(String nombre)
+        +getNombre() String
+        +setNombre(String nombre) void
+        +tipo() String
+    }
+    class Cliente {
+        +Cliente(String nombre)
+        +tipo() String
+    }
+    class Mecanico {
+        +Mecanico(String nombre)
+        +tipo() String
+    }
+    class ResumenPersonas {
+        -List~Persona~ personas
+        +ResumenPersonas()
+        +agregar(Persona persona) void
+        +obtenerResumen() List~String~
+    }
+    class OrdenTrabajo {
+        -int id
+        -String estado
+        -List~DetalleServicio~ servicios
+        -List~DetalleRepuesto~ repuestos
+        +OrdenTrabajo(int id, String estado)
+        +agregarServicio(String descripcion, BigDecimal costo) void
+        +agregarRepuesto(String nombre, int cantidad, BigDecimal precio) void
+        +tieneServicios() boolean
+        +calcularTotal() BigDecimal
+    }
+    class DetalleServicio {
+        -String descripcion
+        -BigDecimal costo
+        +getDescripcion() String
+        +getCosto() BigDecimal
+    }
+    class DetalleRepuesto {
+        -String nombre
+        -int cantidad
+        -BigDecimal precio
+        +getNombre() String
+        +getCantidad() int
+        +getPrecio() BigDecimal
+        +getSubtotal() BigDecimal
+    }
+    class OrdenService {
+        +crear(int vehiculo, int mecanico, String problema) void
+        +iniciar(int id) void
+        +servicio(int id, int servicio) void
+        +repuesto(int id, int repuesto, int cantidad) void
+        +quitarRepuesto(int orden, int detalle) void
+        +quitarServicio(int orden, int detalle) void
+        +finalizarOrden(int id) void
+        +cancelar(int id) void
+    }
+    Persona <|-- Cliente
+    Persona <|-- Mecanico
+    ResumenPersonas o-- "0..*" Persona : agrupa
+    OrdenTrabajo *-- "0..*" DetalleServicio : contiene
+    OrdenTrabajo *-- "0..*" DetalleRepuesto : contiene
+    OrdenService ..> OrdenTrabajo : carga y calcula

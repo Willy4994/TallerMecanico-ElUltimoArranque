@@ -1,0 +1,5 @@
+Diagramas basados en el ZIP TallerMecanico-ElUltimoArranque(2).zip.
+Los archivos .mmd son editables en Mermaid Live Editor.
+Los PNG son versiones visuales equivalentes maquetadas en Graphviz para facilitar lectura en horizontal.
+Los archivos .dot son fuentes de los PNG.
+El UML representa el modelo de dominio y OrdenService, no todas las clases MVC.
