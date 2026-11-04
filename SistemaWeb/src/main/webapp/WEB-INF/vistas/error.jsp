@@ -1,0 +1,1 @@
+<%@ page contentType="text/html;charset=UTF-8" %><html><head><meta charset="UTF-8"><title>Error</title></head><body><h2>No se pudo abrir el taller</h2><p>${error}</p><p>Revisa MySQL y las variables TALLER_DB_USER / TALLER_DB_PASSWORD.</p><a href="app">Reintentar</a></body></html>  
