@@ -20,11 +20,11 @@ import java.io.InputStreamReader;
 public class MainActivity extends AppCompatActivity {
 
     // Dirección de nuestra API REST en Tomcat.
-    // 10.0.2.2 permite acceder al localhost de la Mac
+    // Con adb reverse, 127.0.0.1:8080 apunta al servidor Spring Boot de la Mac
     // desde el emulador Android.
 
     private static final String API_URL =
-            "http://127.0.0.1:8080/api/inventario";
+            "http://127.0.0.1:8080/SistemaWeb/api/inventario";
 
     private Button btnActualizar;
     private TextView txtEstado;

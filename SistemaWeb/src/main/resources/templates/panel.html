@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>El Ultimo Arranque</title><link rel="stylesheet" th:href="@{/assets/estilo.css}"></head>
+<body><div class="shell"><aside class="menu">
+ <div class="logo">▣ EL ULTIMO<br> ARRANQUE<span>GARAGE SYSTEM / 1987</span></div>
+ <a th:href="@{/app}" th:classappend="${modulo == 'inicio'} ? 'active'">⌂ Inicio</a>
+ <a th:each="d : ${definiciones.values()}" th:href="@{/app(modulo=${d.tabla})}" th:classappend="${modulo == d.tabla} ? 'active'" th:text="'▸ ' + ${d.titulo}">Modulo</a>
+ <a th:href="@{/app(modulo='ordenes')}" th:classappend="${modulo == 'ordenes'} ? 'active'">▸ Ordenes</a>
+ <a th:href="@{/app(modulo='reportes')}" th:classappend="${modulo == 'reportes'} ? 'active'">▸ Reportes PDF</a>
+ <div class="sidefoot">UMG · PROGRAMACION II<br>JAVA / MYSQL / SPRING MVC</div>
+ </aside><main class="contenido"><header><div><small>▸ PANEL DE CONTROL</small><h1 th:text="${titulo}">EL ULTIMO ARRANQUE</h1></div><span class="tag">● TALLER ABIERTO</span></header>
+ <div class="aviso" th:if="${mensaje != null and !mensaje.isEmpty()}" th:text="${mensaje}"></div>
+ <th:block th:if="${modulo == 'inicio'}"><div class="cards">
+  <div class="card"><span>ORDENES</span><strong th:text="${#lists.size(ordenes)}">0</strong></div>
+  <div class="card"><span>PENDIENTES</span><strong th:text="${pendientes}">0</strong></div>
+  <div class="card"><span>EN PROCESO</span><strong th:text="${proceso}">0</strong></div>
+  <div class="card"><span>FINALIZADAS</span><strong th:text="${finalizadas}">0</strong></div>
+ </div><section class="caja"><h2>BIENVENIDO AL GARAGE</h2><p>Registra clientes, vehiculos y mecanicos; crea ordenes, asigna servicios y repuestos, y genera comprobantes.</p><a class="btn" th:href="@{/app(modulo='ordenes')}">ABRIR ORDENES →</a></section></th:block>
+ <th:block th:if="${def != null}">
+  <section class="caja"><h2 th:text="'REGISTRAR / EDITAR ' + ${def.titulo}">Registrar</h2>
+   <form class="formgrid" th:action="@{/app}" method="post"><input type="hidden" name="modulo" th:value="${modulo}"><input type="hidden" name="id" value="">
+    <label th:each="campo : ${def.campos}"><span th:text="${campo.etiqueta}">Campo</span><input th:name="${campo.nombre}" th:type="${campo.tipo == 'decimal' ? 'number' : campo.tipo}" th:step="${campo.tipo == 'decimal' ? '0.01' : null}" required></label>
+    <button class="btn" type="submit">GUARDAR</button>
+   </form>
+  </section>
+  <section class="caja"><h2 th:text="'REGISTROS DE ' + ${def.titulo}">Registros</h2><div class="tabla"><table><thead><tr><th th:each="col : ${def.columnas}" th:text="${col}"></th><th>ACCIONES</th></tr></thead><tbody>
+   <tr th:each="fila : ${filas}"><td th:each="col : ${def.columnas}" th:text="${fila.get(col)}"></td><td>
+    <button class="mini" type="button" onclick="editarFila(this)">EDITAR</button><span th:each="campo : ${def.campos}" th:attr="data-campo=${campo.nombre},data-valor=${fila.get(campo.nombre)}" hidden></span><span th:attr="data-campo='id',data-valor=${fila.get('id')}" hidden></span>
+    <form class="inline" th:action="@{/app}" method="post" onsubmit="return confirm('¿Eliminar registro?')"><input type="hidden" name="modulo" th:value="${modulo}"><input type="hidden" name="accion" value="borrar"><input type="hidden" name="id" th:value="${fila.get('id')}"><button class="mini danger" type="submit">ELIMINAR</button></form>
+   </td></tr>
+  </tbody></table></div></section>
+  <section class="caja" th:if="${modulo == 'repuestos'}"><h2>ABASTECER INVENTARIO</h2><form class="formgrid" th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="repuestos"><input type="hidden" name="accion" value="abastecer"><label>ID REPUESTO<input type="number" name="id" min="1" required></label><label>CANTIDAD<input type="number" name="cantidad" min="1" required></label><button class="btn" type="submit">ABASTECER</button></form></section>
+ </th:block>
+ <th:block th:if="${modulo == 'ordenes'}">
+  <section class="caja"><h2>NUEVA ORDEN DE TRABAJO</h2><form class="formgrid" th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="ordenes"><input type="hidden" name="accion" value="crear">
+   <label>VEHICULO<select name="vehiculo_id" required><option th:each="v : ${vehiculos}" th:value="${v.get('id')}" th:text="${v.get('placa') + ' · ' + v.get('marca')}"></option></select></label>
+   <label>MECANICO<select name="mecanico_id" required><option th:each="m : ${mecanicos}" th:value="${m.get('id')}" th:text="${m.get('nombre')}"></option></select></label>
+   <label>PROBLEMA<input type="text" name="problema" required></label><button class="btn" type="submit">CREAR ORDEN</button>
+  </form></section>
+  <section class="caja"><h2>ORDENES REGISTRADAS</h2><div class="tabla"><table><thead><tr><th>ID</th><th>PLACA</th><th>MECANICO</th><th>PROBLEMA</th><th>ESTADO</th><th>TOTAL Q</th><th>ACCIONES</th></tr></thead><tbody>
+   <tr th:each="o : ${ordenes}"><td th:text="${o.get('id')}"></td><td th:text="${o.get('placa')}"></td><td th:text="${o.get('mecanico')}"></td><td th:text="${o.get('problema')}"></td><td class="estado" th:text="${o.get('estado')}"></td><td th:text="${o.get('total')}"></td><td>
+    <form class="inline" th:if="${o.get('estado') == 'PENDIENTE'}" th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="ordenes"><input type="hidden" name="accion" value="iniciar"><input type="hidden" name="id" th:value="${o.get('id')}"><button class="mini" type="submit">INICIAR</button></form>
+    <form class="inline" th:if="${o.get('estado') == 'EN PROCESO'}" th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="ordenes"><input type="hidden" name="accion" value="finalizar"><input type="hidden" name="id" th:value="${o.get('id')}"><button class="mini" type="submit">FINALIZAR</button></form>
+    <form class="inline" th:if="${o.get('estado') == 'PENDIENTE' or o.get('estado') == 'EN PROCESO'}" th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="ordenes"><input type="hidden" name="accion" value="cancelar"><input type="hidden" name="id" th:value="${o.get('id')}"><button class="mini danger" type="submit">CANCELAR</button></form>
+    <a class="mini" th:if="${o.get('estado') == 'FINALIZADA'}" th:href="@{/comprobante(id=${o.get('id')})}">COMPROBANTE PDF</a>
+   </td></tr>
+  </tbody></table></div></section>
+  <section class="caja"><h2>AGREGAR SERVICIO A ORDEN</h2><form class="formgrid" th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="ordenes"><input type="hidden" name="accion" value="servicio"><label>ID ORDEN<input type="number" name="id" required min="1"></label><label>SERVICIO<select name="servicio_id" required><option th:each="s : ${servicios}" th:value="${s.get('id')}" th:text="${s.get('descripcion') + ' · Q ' + s.get('costo')}"></option></select></label><button class="btn" type="submit">AGREGAR SERVICIO</button></form></section>
+  <section class="caja"><h2>AGREGAR REPUESTO A ORDEN</h2><form class="formgrid" th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="ordenes"><input type="hidden" name="accion" value="repuesto"><label>ID ORDEN<input type="number" name="id" required min="1"></label><label>REPUESTO<select name="repuesto_id" required><option th:each="r : ${repuestos}" th:value="${r.get('id')}" th:text="${r.get('nombre') + ' · disponibles: ' + r.get('existencia')}"></option></select></label><label>CANTIDAD<input type="number" name="cantidad" required min="1"></label><button class="btn" type="submit">AGREGAR REPUESTO</button></form></section>
+  <section class="caja"><h2>SERVICIOS ASIGNADOS</h2><div class="tabla"><table><thead><tr><th>ID</th><th>ORDEN</th><th>SERVICIO</th><th>COSTO</th><th>ACCION</th></tr></thead><tbody><tr th:each="d : ${detServicios}"><td th:text="${d.get('id')}"></td><td th:text="${d.get('orden_id')}"></td><td th:text="${d.get('descripcion')}"></td><td th:text="${d.get('costo')}"></td><td><form th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="ordenes"><input type="hidden" name="accion" value="quitarServicio"><input type="hidden" name="id" th:value="${d.get('orden_id')}"><input type="hidden" name="detalle" th:value="${d.get('id')}"><button class="mini danger">QUITAR</button></form></td></tr></tbody></table></div></section>
+  <section class="caja"><h2>REPUESTOS ASIGNADOS</h2><div class="tabla"><table><thead><tr><th>ID</th><th>ORDEN</th><th>REPUESTO</th><th>CANTIDAD</th><th>PRECIO</th><th>ACCION</th></tr></thead><tbody><tr th:each="d : ${detRepuestos}"><td th:text="${d.get('id')}"></td><td th:text="${d.get('orden_id')}"></td><td th:text="${d.get('nombre')}"></td><td th:text="${d.get('cantidad')}"></td><td th:text="${d.get('precio')}"></td><td><form th:action="@{/app}" method="post"><input type="hidden" name="modulo" value="ordenes"><input type="hidden" name="accion" value="quitarRepuesto"><input type="hidden" name="id" th:value="${d.get('orden_id')}"><input type="hidden" name="detalle" th:value="${d.get('id')}"><button class="mini danger">QUITAR</button></form></td></tr></tbody></table></div></section>
+ </th:block>
+ <th:block th:if="${modulo == 'reportes'}"><section class="caja"><h2>REPORTES PDF</h2><div class="reportes"><form th:each="t : ${tipos}" th:action="@{/reporte}" method="get"><input type="hidden" name="tipo" th:value="${t.key}"><h3 th:text="${t.value}"></h3><label th:if="${t.key == 'historial'}">PLACA<input type="text" name="placa" required></label><th:block th:if="${t.key == 'ingresos'}"><label>DESDE<input type="date" name="desde" required></label><label>HASTA<input type="date" name="hasta" required></label></th:block><button class="btn" type="submit">GENERAR PDF</button></form></div></section></th:block>
+ <footer>EL ULTIMO ARRANQUE · JAVA · SPRING BOOT MVC · MYSQL</footer></main></div>
+ <script th:src="@{/assets/app.js}"></script>
+ <script th:inline="javascript">/*<![CDATA[*/
+ // Los valores para edición se obtienen de atributos seguros, no de código JSP.
+ /*]]>*/</script>
+ </body></html>

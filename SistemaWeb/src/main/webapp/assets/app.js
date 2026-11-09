@@ -1,1 +1,0 @@
-function editar(fila){let form=document.querySelector('.formgrid');if(!form)return;for(let [clave,valor] of Object.entries(fila)){let input=form.querySelector('[name="'+clave+'"]');if(input)input.value=valor;}window.scrollTo({top:0,behavior:'smooth'});}

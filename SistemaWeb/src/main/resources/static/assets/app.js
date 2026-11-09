@@ -1,0 +1,1 @@
+function editarFila(boton){const form=document.querySelector('.formgrid');if(!form)return;const celda=boton.closest('td');celda.querySelectorAll('[data-campo]').forEach(el=>{const input=form.querySelector('[name="'+el.dataset.campo+'"]');if(input)input.value=el.dataset.valor??'';});window.scrollTo({top:0,behavior:'smooth'});}

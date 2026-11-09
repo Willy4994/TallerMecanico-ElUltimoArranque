@@ -1,0 +1,13 @@
+flowchart LR
+ U[Usuario / Navegador] -->|GET / POST| C[PanelControlador - Spring MVC]
+ C -->|model.addAttribute| V[HTML + Thymeleaf]
+ V -->|HTML| U
+ C --> S[OrdenService]
+ C --> D[RegistroDAO]
+ S --> B[(MySQL)]
+ D --> B
+ A[App Android] -->|HTTP GET| API[InventarioApiControlador]
+ API -->|JDBC| B
+ API -->|JSON| A
+ C --> P[Controladores PDF]
+ P --> B
